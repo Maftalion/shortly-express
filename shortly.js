@@ -76,7 +76,8 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
-
+//app.get for login endpoint
+//app.get for signup endpoint
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
