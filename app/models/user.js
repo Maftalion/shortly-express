@@ -16,10 +16,10 @@ var User = db.Model.extend({
         if (err) { return console.log(err); }
         salt = result;
       });
-      bcrypt.hash(pw, salt, null, function(err, hash) {
+      var shasum = bcrypt.hash(pw, salt, null, function(err, hash) {
         if (err) { return console.log('err', err ); }
         model.set('password', hash);
-        model.set('salt', salt);
+        model.set('code', hash);
       });
     });
   }

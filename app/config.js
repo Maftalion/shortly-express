@@ -44,14 +44,17 @@ db.knex.schema.hasTable('users').then(function(exists) {
   if (!exists) {
     db.knex.schema.createTable('users', function (user) {
       user.increments('id').primary();
+      user.string('created_at', 255);
+      user.string('updated_at', 255);
       user.string('username', 20);
       user.string('password', 255);
-      link.string('salt', 10);
+      user.string('code', 50);
       user.timestamps();
     }).then(function (table) {
       console.log('Created Table', table);
     });
   }
+
 });
 
 module.exports = db;
