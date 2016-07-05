@@ -28,7 +28,8 @@ app.use(session({
   saveUninitialized: true
 }));
 var auth = function(req, res, next) {
-  if (req.session && req.session.user) {
+  if (req.session && req.session.userID) {
+    console.log(req.session.userID);
     return next();
   } else {
     res.redirect('/login');
@@ -109,7 +110,7 @@ app.post('/signup', function(req, res) {
         password: password
       })
       .then(function(user) {
-        req.session.user = username;
+        req.session.userID = found.attributes.id;
         res.header('location', '/signup');
         res.status(201);
         res.redirect('/');
@@ -122,9 +123,13 @@ app.post('/signup', function(req, res) {
 app.post('/login', function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
+  var ID;
+  var data = Users.fetch();
+
+  // console.log('data', data);
   new User({ username: username, password: password}).fetch().then(function(found) {
     if (found) {
-      req.session.user = username;
+      req.session.userID = found.attributes.id;
       res.status(201);
       res.redirect('/');
     } else {
@@ -134,7 +139,10 @@ app.post('/login', function(req, res) {
     }
   });
 });
-
+  // Users.fetch().then(function(users) {
+  //   console.log('USERS ID', users.models[0].attributes.id);
+  //   res.status(200).send(users.models);
+  // });
 
 /************************************************************/
 // Write your authentication routes here
