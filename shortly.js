@@ -41,6 +41,17 @@ function(req, res) {
   res.render('index');
 });
 
+app.get('/logout', function(req, res) {
+  req.session.destroy(function(err){
+    if (err){
+      return err;
+    } else {
+      res.status(201);
+      res.redirect('/'); 
+    }
+  });
+});
+
 app.get('/login', 
 function(req, res) {
   res.render('login');
@@ -138,6 +149,7 @@ app.post('/login', function(req, res) {
   });
 });
 
+// app.on('click', f)
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
