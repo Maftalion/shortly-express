@@ -32,7 +32,6 @@ var auth = function(req, res, next) {
     return next();
   } else {
     res.redirect('/login');
-    return res.sendStatus(401);
   }
 };
 
@@ -42,11 +41,10 @@ function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
-  req.session.destroy(function(err){
-    if (err){
+  req.session.destroy(function(err) {
+    if (err) {
       return err;
     } else {
-      res.status(201);
       res.redirect('/'); 
     }
   });
@@ -112,8 +110,8 @@ app.post('/signup', function(req, res) {
   var password = req.body.password;
   new User({ username: username, password: password}).fetch().then(function(found) {
     if (found) {
-      res.redirect('/signup');
-      res.status(201).send(found.attributes);
+      res.redirect(201, '/signup');
+      // res.status(201).send(found.attributes);
     } else {
       Users.create({
         username: username,
@@ -121,10 +119,7 @@ app.post('/signup', function(req, res) {
       })
       .then(function(user) {
         req.session.userID = user.attributes.id;
-        res.header('location', '/signup');
-        res.status(201);
-        res.redirect('/');
-        
+        res.redirect('/');        
       });
     }
   });
@@ -139,11 +134,8 @@ app.post('/login', function(req, res) {
   new User({ username: username, password: password}).fetch().then(function(found) {
     if (found) {
       req.session.userID = found.attributes.id;
-      res.status(201);
-      res.redirect('/');
+      res.redirect( '/');
     } else {
-      res.header('location', '/login');
-      res.status(201);
       res.redirect('/login');
     }
   });
