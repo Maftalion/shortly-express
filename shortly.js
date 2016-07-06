@@ -4,7 +4,7 @@ var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var $ = require('jquery');
-
+var knex = require('knex');
 var db = require('./app/config');
 var Users = require('./app/collections/users');
 var User = require('./app/models/user');
@@ -25,11 +25,10 @@ app.use(express.static(__dirname + '/public'));
 app.use(session({
   secret: 'hello123',
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
 }));
 var auth = function(req, res, next) {
   if (req.session && req.session.userID) {
-    console.log(req.session.userID);
     return next();
   } else {
     res.redirect('/login');
@@ -58,10 +57,9 @@ function(req, res) {
   res.render('index');
 });
 
-app.get('/links', auth,
-function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.status(200).send(links.models);
+app.get('/links', auth, function(req, res) {
+  Links.query({where: {userId: req.session.userID}}).fetch().then(function(models) {
+    res.status(200).send(models);
   });
 });
 
@@ -87,7 +85,8 @@ function(req, res) {
         Links.create({
           url: uri,
           title: title,
-          baseUrl: req.headers.origin
+          baseUrl: req.headers.origin,
+          userID: req.session.userID
         })
         .then(function(newLink) {
           res.status(200).send(newLink);
@@ -110,7 +109,7 @@ app.post('/signup', function(req, res) {
         password: password
       })
       .then(function(user) {
-        req.session.userID = found.attributes.id;
+        req.session.userID = user.attributes.id;
         res.header('location', '/signup');
         res.status(201);
         res.redirect('/');
@@ -126,7 +125,6 @@ app.post('/login', function(req, res) {
   var ID;
   var data = Users.fetch();
 
-  // console.log('data', data);
   new User({ username: username, password: password}).fetch().then(function(found) {
     if (found) {
       req.session.userID = found.attributes.id;
@@ -139,10 +137,6 @@ app.post('/login', function(req, res) {
     }
   });
 });
-  // Users.fetch().then(function(users) {
-  //   console.log('USERS ID', users.models[0].attributes.id);
-  //   res.status(200).send(users.models);
-  // });
 
 /************************************************************/
 // Write your authentication routes here
